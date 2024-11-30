@@ -6,8 +6,6 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody), typeof(Renderer))]
 public class Cube : MonoBehaviour
 {
-    [SerializeField] private Platform _platform;
-
     private bool _isTouched = false;
 
     public event Action<Cube> Touched;
