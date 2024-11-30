@@ -1,14 +1,19 @@
+using System;
+using System.Runtime.InteropServices;
+using Unity.VisualScripting;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody), typeof(Renderer))]
 public class Cube : MonoBehaviour
 {
-    [SerializeField] private float _lifeTime;
+    [SerializeField] private Platform _platform;
 
     private bool _isTouched = false;
 
+    public event Action<Cube> Touched;
+
     public Rigidbody Rigidbody { get; private set; }
     public Renderer Renderer { get; private set; }
-    public MeshRenderer MeshRenderer { get; private set; }
 
     private void Awake()
     {
@@ -18,23 +23,22 @@ public class Cube : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if(this._isTouched == true)
+        if(_isTouched == true)
             return;
 
-        if (collision.gameObject.tag == "Platform")
+        if (collision.gameObject.GetComponent<Platform>())
         {
-            Destroy(gameObject, CalculateLifeTime());
             Renderer.material.color = Color.red;
-            this._isTouched = true;
+            _isTouched = true;
+            Touched?.Invoke(this);
         }
-
     }
 
-    private float CalculateLifeTime()
+    public float CalculateLifeTime()
     {
         float lowLifeTime = 2.0f;
         float highLifeTime = 5.0f;
 
-        return _lifeTime = UnityEngine.Random.Range(lowLifeTime, highLifeTime + 1);
+        return UnityEngine.Random.Range(lowLifeTime, highLifeTime);
     }
 }
