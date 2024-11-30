@@ -3,7 +3,7 @@ using UnityEngine.Pool;
 
 public class Spawner : MonoBehaviour
 {
-    [SerializeField] private GameObject _cube;
+    [SerializeField] private GameObject _cubePrefab;
     [SerializeField] private float _repeatRate = 1f;
     [SerializeField] private int _poolCapacity = 5;
     [SerializeField] private int _poolMaxSize = 5;
@@ -14,9 +14,9 @@ public class Spawner : MonoBehaviour
     {
         _pool = new ObjectPool<GameObject>
         (
-            createFunc: () => Instantiate(_cube),
+            createFunc: () => Instantiate(_cubePrefab),
             actionOnGet: (cube) => ActionOnGet(cube),
-            actionOnRelease: (cube) => cube.SetActive(false),
+            actionOnRelease: (cube) => cube.gameObject.SetActive(false),
             actionOnDestroy: (cube) => Destroy(cube),
             collectionCheck: true,
             defaultCapacity: _poolCapacity,
@@ -27,12 +27,6 @@ public class Spawner : MonoBehaviour
     private void Start()
     {
         InvokeRepeating(nameof(GetCube), 0.0f, _repeatRate);
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        Debug.Log("ASDASDA");
-        _pool.Release(other.gameObject);
     }
 
     private void ActionOnGet(GameObject cube)
