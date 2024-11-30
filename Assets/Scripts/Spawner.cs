@@ -7,9 +7,9 @@ using UnityEngine.Pool;
 public class Spawner : MonoBehaviour
 {
     [SerializeField] private Cube _cubePrefab;
-    [SerializeField] private float _repeatRate = 1f;
     [SerializeField] private int _poolCapacity = 5;
     [SerializeField] private int _poolMaxSize = 5;
+    [SerializeField] private int _sizeUnitSphere = 5;
 
     private bool _isSpawned = true;
 
@@ -20,7 +20,7 @@ public class Spawner : MonoBehaviour
         _pool = new ObjectPool<Cube>
         (
             createFunc: () => Instantiate(_cubePrefab),
-            actionOnGet: (cube) => OnGet(cube),
+            actionOnGet: (cube) => OnGetCube(cube),
             actionOnRelease: (cube) => OnReleaseCube(cube),
             actionOnDestroy: (cube) => Destroy(cube),
             collectionCheck: true,
@@ -34,12 +34,10 @@ public class Spawner : MonoBehaviour
         StartCoroutine(InstantiateCube());
     }
 
-    private void OnGet(Cube cube)
+    private void OnGetCube(Cube cube)
     {
         cube.Touched += OnReleaseCube;
-        cube.transform.position = transform.localPosition + Random.insideUnitSphere * 5;
-        cube.gameObject.SetActive(true);
-        ReleaseCube(cube);
+        cube.transform.position = transform.localPosition + Random.insideUnitSphere * _sizeUnitSphere;
     }
 
     private void OnReleaseCube(Cube cube)
@@ -52,7 +50,6 @@ public class Spawner : MonoBehaviour
     {
         WaitForSeconds lifeTime = new WaitForSeconds(cube.CalculateLifeTime());
         yield return lifeTime;
-        _pool.Release(cube);
         cube.gameObject.SetActive(false);
     }
 
